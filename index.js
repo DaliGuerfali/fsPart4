@@ -3,21 +3,12 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const mongoose = require('mongoose');
+const Blog = require('./models/blog');
 
 
-const blogSchema = new mongoose.Schema({
-  title: String,
-  author: String,
-  url: String,
-  likes: Number
-});
-
-const Blog = mongoose.model('Blog', blogSchema);
-
-const mongoUrl = MONGODB_URI;
 
 console.log('Connecting to db...');
-mongoose.connect(mongoUrl).then(() => {
+mongoose.connect(MONGODB_URI).then(() => {
     console.log('Connected to db!');
 })
 .catch(err => {
