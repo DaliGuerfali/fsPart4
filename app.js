@@ -3,22 +3,29 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const config = require('./utils/config');
 const blogsRouter = require('./controllers/blogs');
+const middleware = require('./utils/middleware');
+const logger = require('./utils/logger');
 
 const app = express();
 
 
-console.log('Connecting to db...');
+logger.info('Connecting to db...');
 mongoose.connect(config.MONGODB_URI).then(() => {
-    console.log('Connected to db!');
+    logger.info('Connected to db!');
 })
 .catch(err => {
-    console.log('Connection failed:');
-    console.log(err);
+    logger.error('Connection failed:', err);
 });
 
 app.use(cors());
+//app.use(build);
 app.use(express.json());
+app.use(middleware.requestLogger);
+
 app.use('/api/blogs', blogsRouter);
+
+app.use(middleware.unknownEndpoint);
+app.use(middleware.errorHandler);
 
 
 
