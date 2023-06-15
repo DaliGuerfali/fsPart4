@@ -62,86 +62,89 @@ beforeEach(async () => {
 }, 100000);
 
 
-test('returns the correct amount of blogs in JSON', async () => {
-  const response = await api
+describe('when fetching blogs from database', () => {
+  test('returns the correct amount of blogs in JSON', async () => {
+    const response = await api
     .get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /application\/json/);
     
     expect(response.body).toHaveLength(blogs.length);
     
-},100000);
-
-
-test('verify that the unique identifier of each blog is named id', async () => {
-  const response = await api
+  },100000);
+  
+  
+  test('verify that the unique identifier of each blog is named id', async () => {
+    const response = await api
     .get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /application\/json/);
     
     response.body.forEach(blog => expect(blog.id).toBeDefined());
     
-},100000);
+  },100000);
+});
 
-
-test('verify creation', async () => {
+describe('when creating and sending a blog', () => {
+  
+  test('verify post creation is correct', async () => {
     const newBlog = {
       title: 'test',
       author: 'test',
       url: 'www.test.com',
       likes: 4
     }
-  const response = await api
+    const response = await api
     .post('/api/blogs')
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/);
-
+    
     expect(response.body).toEqual({...newBlog, id: response.body.id});
-
+    
     const responseBlogs = (await api.get('/api/blogs')).body;
-
+    
     expect(responseBlogs).toHaveLength(blogs.length + 1);
     expect(responseBlogs.find(blog => blog.id === response.body.id))
-      .toEqual({...newBlog, id: response.body.id});
-
-},100000);
-
-test('verify likes', async () => {
-  const newBlog = {
-    title: 'test',
-    author: 'test',
-    url: 'www.test.com',
-  }
-  const response = await api
+    .toEqual({...newBlog, id: response.body.id});
+    
+  },100000);
+  
+  test('verify that likes default to 0 if not sent', async () => {
+    const newBlog = {
+      title: 'test',
+      author: 'test',
+      url: 'www.test.com',
+    }
+    const response = await api
     .post('/api/blogs')
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/);
-
+    
     expect(response.body).toEqual({...newBlog, id: response.body.id, likes: 0 });
+    
+  },100000);
 
-},100000);
+  test('return status 400 when url or title missing', async () => {
+    const urlLessBlog = {
+      title: 'test',
+      author: 'test',
+    }
+    const titleLessBlog = {
+      url: 'www.test.com',
+      author: 'test',
+    }
+    const authorBlog = {
+      author: 'test',
+    }
 
+    await api.post('/api/blogs').send(titleLessBlog).expect(400);
+    await api.post('/api/blogs').send(urlLessBlog).expect(400);
+    await api.post('/api/blogs').send(authorBlog).expect(400);
 
-test('verify url or title missing', async () => {
-  const urlLessBlog = {
-    title: 'test',
-    author: 'test',
-  }
-  const titleLessBlog = {
-    url: 'www.test.com',
-    author: 'test',
-  }
-  const authorBlog = {
-    author: 'test',
-  }
-
-  await api.post('/api/blogs').send(titleLessBlog).expect(400);
-  await api.post('/api/blogs').send(urlLessBlog).expect(400);
-  await api.post('/api/blogs').send(authorBlog).expect(400);
-  
-},100000);
+  },100000);
+});
 
 afterAll(async () => {
   await mongoose.connection.close();
