@@ -11,11 +11,11 @@ const app = express();
 
 logger.info('Connecting to db...');
 mongoose.connect(config.MONGODB_URI).then(() => {
-    logger.info('Connected to db!');
+  logger.info('Connected to db!');
 })
-.catch(err => {
+  .catch(err => {
     logger.error('Connection failed:', err);
-});
+  });
 
 app.use(cors());
 //app.use(build);
