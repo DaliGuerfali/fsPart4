@@ -1,8 +1,9 @@
+const { MONGODB_URI, PORT } = require('./utils/config');
 const express = require('express');
 const app = express();
 const cors = require('cors');
 const mongoose = require('mongoose');
-require('dotenv').config();
+
 
 const blogSchema = new mongoose.Schema({
   title: String,
@@ -13,7 +14,7 @@ const blogSchema = new mongoose.Schema({
 
 const Blog = mongoose.model('Blog', blogSchema);
 
-const mongoUrl = process.env.MONGODB_URI;
+const mongoUrl = MONGODB_URI;
 
 console.log('Connecting to db...');
 mongoose.connect(mongoUrl).then(() => {
@@ -45,7 +46,6 @@ app.post('/api/blogs', (request, response) => {
     });
 });
 
-const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 });
