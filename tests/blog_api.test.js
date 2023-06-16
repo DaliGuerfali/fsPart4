@@ -85,7 +85,7 @@ describe('when fetching blogs from database', () => {
   },100000);
 });
 
-describe('when creating and sending a blog post', () => {
+describe('when creating blog posts', () => {
 
   test('verify post creation is correct', async () => {
     const newBlog = {
@@ -146,7 +146,7 @@ describe('when creating and sending a blog post', () => {
   },100000);
 });
 
-describe('when deleting a blog post', () => {
+describe('when deleting blog posts', () => {
   test('verify that a blog is deleted', async () => {
     const id = '5a422bc61b54a676234d17fc';
     await api
