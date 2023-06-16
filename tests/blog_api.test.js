@@ -2,64 +2,14 @@ const mongoose = require('mongoose');
 const supertest = require('supertest');
 const app = require('../app');
 const Blog = require('../models/blog');
+const helper = require('./testHelper');
+
 
 const api = supertest(app);
 
-const blogs = [
-  {
-    _id: '5a422a851b54a676234d17f7',
-    title: 'React patterns',
-    author: 'Michael Chan',
-    url: 'https://reactpatterns.com/',
-    likes: 7,
-    __v: 0
-  },
-  {
-    _id: '5a422aa71b54a676234d17f8',
-    title: 'Go To Statement Considered Harmful',
-    author: 'Edsger W. Dijkstra',
-    url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-    likes: 5,
-    __v: 0
-  },
-  {
-    _id: '5a422b3a1b54a676234d17f9',
-    title: 'Canonical string reduction',
-    author: 'Edsger W. Dijkstra',
-    url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
-    likes: 12,
-    __v: 0
-  },
-  {
-    _id: '5a422b891b54a676234d17fa',
-    title: 'First class tests',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
-    likes: 10,
-    __v: 0
-  },
-  {
-    _id: '5a422ba71b54a676234d17fb',
-    title: 'TDD harms architecture',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
-    likes: 0,
-    __v: 0
-  },
-  {
-    _id: '5a422bc61b54a676234d17fc',
-    title: 'Type wars',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
-    likes: 2,
-    __v: 0
-  }
-];
 
-beforeEach(async () => {
-  await Blog.deleteMany({});
-  await Promise.all(blogs.map(blog => (new Blog(blog)).save()));
-}, 100000);
+
+beforeEach(helper.initDb, 100000);
 
 
 describe('when fetching blogs from database', () => {
@@ -69,8 +19,7 @@ describe('when fetching blogs from database', () => {
       .expect(200)
       .expect('Content-Type', /application\/json/);
 
-    expect(response.body).toHaveLength(blogs.length);
-
+    expect(response.body).toHaveLength(helper.blogs.length);
   },100000);
 
 
@@ -86,13 +35,13 @@ describe('when fetching blogs from database', () => {
 });
 
 describe('when creating blog posts', () => {
-
   test('verify post creation is correct', async () => {
     const newBlog = {
       title: 'test',
       author: 'test',
       url: 'www.test.com',
-      likes: 4
+      likes: 4,
+      user: '648ca3e83a2b3c9fa68cff11'
     };
     const response = await api
       .post('/api/blogs')
@@ -103,10 +52,18 @@ describe('when creating blog posts', () => {
     expect(response.body).toEqual({ ...newBlog, id: response.body.id });
 
     const responseBlogs = (await api.get('/api/blogs')).body;
+    console.log(responseBlogs);
 
-    expect(responseBlogs).toHaveLength(blogs.length + 1);
+    expect(responseBlogs).toHaveLength(helper.blogs.length + 1);
     expect(responseBlogs.find(blog => blog.id === response.body.id))
-      .toEqual({ ...newBlog, id: response.body.id });
+      .toEqual({ 
+        ...newBlog, 
+        id: response.body.id, 
+        user: { 
+        id: '648ca3e83a2b3c9fa68cff11',
+        username: 'Mike',
+        name: 'Michael Chan', 
+    }});
 
   },100000);
 
@@ -115,6 +72,7 @@ describe('when creating blog posts', () => {
       title: 'test',
       author: 'test',
       url: 'www.test.com',
+      user: '648ca3e83a2b3c9fa68cff11'
     };
     const response = await api
       .post('/api/blogs')
@@ -130,13 +88,16 @@ describe('when creating blog posts', () => {
     const urlLessBlog = {
       title: 'test',
       author: 'test',
+      user: '648ca3e83a2b3c9fa68cff11'
     };
     const titleLessBlog = {
       url: 'www.test.com',
       author: 'test',
+      user: '648ca3e83a2b3c9fa68cff11'
     };
     const authorBlog = {
       author: 'test',
+      user: '648ca3e83a2b3c9fa68cff11'
     };
 
     await api.post('/api/blogs').send(titleLessBlog).expect(400);
@@ -154,7 +115,7 @@ describe('when deleting blog posts', () => {
       .expect(204);
 
     const blogsInDb = await Blog.find({});
-    expect(blogsInDb).toHaveLength(blogs.length - 1);
+    expect(blogsInDb).toHaveLength(helper.blogs.length - 1);
     expect(blogsInDb.map(blog => blog.id)).not.toContain(id);
   });
 
@@ -171,7 +132,7 @@ describe('when deleting blog posts', () => {
 
 describe('when updating blog posts', () => {
   test('verify updating works as intended', async() => {
-    const blogToUpdate = blogs[0];
+    const blogToUpdate = helper.blogs[0];
     const updatedBlog = (await api
       .put(`/api/blogs/${blogToUpdate._id}`)
       .send({
@@ -200,7 +161,7 @@ describe('when updating blog posts', () => {
   });
 
   test('verify updating works as with empty object', async() => {
-    const blogToUpdate = blogs[0];
+    const blogToUpdate = helper.blogs[0];
     const updatedBlog = (await api
       .put(`/api/blogs/${blogToUpdate._id}`)
       .send({})
