@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const supertest = require('supertest');
 const app = require('../app');
 const Blog = require('../models/blog');
+const User = require('../models/user');
 const helper = require('./testHelper');
 
 
@@ -40,30 +41,32 @@ describe('when creating blog posts', () => {
       title: 'test',
       author: 'test',
       url: 'www.test.com',
-      likes: 4,
-      user: '648ca3e83a2b3c9fa68cff11'
+      likes: 4
     };
     const response = await api
       .post('/api/blogs')
+      .set('authorization', `Bearer ${helper.testToken}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
 
-    expect(response.body).toEqual({ ...newBlog, id: response.body.id });
+    const body = response.body;
+    expect(body).toEqual({ ...newBlog, id: body.id, user: helper.users[0]._id });
 
     const responseBlogs = (await api.get('/api/blogs')).body;
-    console.log(responseBlogs);
 
     expect(responseBlogs).toHaveLength(helper.blogs.length + 1);
     expect(responseBlogs.find(blog => blog.id === response.body.id))
       .toEqual({ 
         ...newBlog, 
-        id: response.body.id, 
+        id: body.id, 
         user: { 
-        id: '648ca3e83a2b3c9fa68cff11',
-        username: 'Mike',
-        name: 'Michael Chan', 
+        id: helper.users[0]._id,
+        username: helper.users[0].username,
+        name: helper.users[0].name, 
     }});
+    const user = await User.findById(helper.users[0]._id);
+    expect(user.blogs.map(u => u.toJSON())).toContain(body.id);
 
   },100000);
 
@@ -72,15 +75,15 @@ describe('when creating blog posts', () => {
       title: 'test',
       author: 'test',
       url: 'www.test.com',
-      user: '648ca3e83a2b3c9fa68cff11'
     };
     const response = await api
       .post('/api/blogs')
+      .set('authorization', `Bearer ${helper.testToken}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
 
-    expect(response.body).toEqual({ ...newBlog, id: response.body.id, likes: 0 });
+    expect(response.body).toEqual({ ...newBlog, id: response.body.id, likes: 0, user: helper.users[0]._id });
 
   },100000);
 
@@ -88,21 +91,30 @@ describe('when creating blog posts', () => {
     const urlLessBlog = {
       title: 'test',
       author: 'test',
-      user: '648ca3e83a2b3c9fa68cff11'
     };
     const titleLessBlog = {
       url: 'www.test.com',
       author: 'test',
-      user: '648ca3e83a2b3c9fa68cff11'
     };
     const authorBlog = {
       author: 'test',
-      user: '648ca3e83a2b3c9fa68cff11'
     };
 
-    await api.post('/api/blogs').send(titleLessBlog).expect(400);
-    await api.post('/api/blogs').send(urlLessBlog).expect(400);
-    await api.post('/api/blogs').send(authorBlog).expect(400);
+    await api
+    .post('/api/blogs')
+    .set('authorization', `Bearer ${helper.testToken}`)
+    .send(titleLessBlog)
+    .expect(400);
+    await api
+    .post('/api/blogs')
+    .set('authorization', `Bearer ${helper.testToken}`)
+    .send(urlLessBlog)
+    .expect(400);
+    await api
+    .post('/api/blogs')
+    .set('authorization', `Bearer ${helper.testToken}`)
+    .send(authorBlog)
+    .expect(400);
 
   },100000);
 });

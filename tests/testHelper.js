@@ -63,7 +63,7 @@ const users = [
       _id: '648ca3e83a2b3c9fa68cff11',
       username: 'Mike',
       name: 'Michael Chan',
-      passwordHash: '3qsd35s651qsd3131sq651qds',
+      passwordHash: '$2b$10$xjGQSDfYlht2UrSjWxAGr.U76i9mrhtLYxRKTt3iay2.YmG85.Iq2',
       blogs: [
         '5a422a851b54a676234d17f7'
       ]
@@ -72,7 +72,7 @@ const users = [
       _id: '648ca3fafb4eba0a849eda9b',
       username: 'Ed265',
       name: 'Edsger W. Dijkstra',
-      passwordHash: '3qsd35s651qsd3131sq651qds',
+      passwordHash: '$2b$10$imQ8IlL0VM8n.eJJdOUEt.LkYhXCFbT1k6zLBKsx4HpSknkihwc5.',
       blogs: [
         '5a422aa71b54a676234d17f8',
         '5a422b3a1b54a676234d17f9'
@@ -82,13 +82,13 @@ const users = [
       _id: '648ca4016ee4751971b230f2',
       username: 'edsger310',
       name: 'Edsger W. Dijkstra',
-      passwordHash: '3qsd35s651qsd3131sq651qds',
+      passwordHash: '$2b$10$az6VYJJ49FtuMQJm45UDDO7g8TH/YOauXMcrvLTkxSF9/sRqSVka.',
     },
     {
       _id: '648ca4067ba7ddcc2033a9de',
       username: 'robby',
       name: 'Robert C. Martin',
-      passwordHash: '3qsd35s651qsd3131sq651qds',
+      passwordHash: '$2b$10$CWVHNoD4iI3CXWr4KbtuH.BhQ57mRULK1cvi.h3FeW883FnE4U/Hy',
       blogs: [
         '5a422b891b54a676234d17fa',
         '5a422ba71b54a676234d17fb'
@@ -98,7 +98,7 @@ const users = [
       _id: '648ca40c19b6bb1e1444de8e',
       username: 'marbo',
       name: 'Robert C. Martin',
-      passwordHash: '3qsd35s651qsd3131sq651qds',
+      passwordHash: '$2b$10$r5mHjwnPdVFPzedWI9AveeyRBhDpkZV9h/N525K9Of9ATGTNBbMtG',
       blogs: [
         '5a422bc61b54a676234d17fc'
       ]
@@ -107,7 +107,7 @@ const users = [
       _id: '648ca4107383e9dfc215c93a',
       username: 'rob2010',
       name: 'Robert C. Martin',
-      passwordHash: '3qsd35s651qsd3131sq651qds',
+      passwordHash: '$2b$10$NfnBBgTtS5PqEqhtE/H2huvb3N802KDYEKSKXDUTlRiME/3PjSw6e',
     }
 ];
 
@@ -119,8 +119,11 @@ const initDb = async () => {
 }
 
 
+const testToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik1pa2UiLCJpZCI6IjY0OGNhM2U4M2EyYjNjOWZhNjhjZmYxMSIsImlhdCI6MTY4Njk1NjcwNX0.CFzioqSCY-e0jsQV08xMYGSYIF_b5kL0lf3PsoWKf9g';
+
 module.exports = {
     blogs,
     users,
-    initDb
+    initDb,
+    testToken
 }
