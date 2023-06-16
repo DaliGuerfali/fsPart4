@@ -3,10 +3,10 @@ const dummy = (blogs) => {
 };
 
 const totalLikes = (blogs) => {
-  return blogs.length === 0 ? 
+  return blogs.length === 0 ?
     0 :
     blogs.reduce((sum, next) => sum + next.likes, 0);
-}
+};
 
 const favoriteBlog = (blogs) => {
   let max = blogs[0];
@@ -16,12 +16,12 @@ const favoriteBlog = (blogs) => {
     }
   });
   return blogs.length === 0 ? {}
-  : {
+    : {
       title: max.title,
       author: max.author,
       likes: max.likes
-    }
-}
+    };
+};
 
 
 const mostBlogs = (blogs) => {
@@ -36,7 +36,7 @@ const mostBlogs = (blogs) => {
 
   let max = blogs[0]?.author;
 
-  for(author in authors) {
+  for(let author in authors) {
     if(authors[max] < authors[author]) {
       max = author;
     }
@@ -44,7 +44,7 @@ const mostBlogs = (blogs) => {
 
   return blogs.length === 0 ? {} : { author: max, blogs: authors[max] };
 
-}
+};
 
 
 const mostLikes = (blogs) => {
@@ -59,14 +59,14 @@ const mostLikes = (blogs) => {
 
   let max = blogs[0]?.author;
 
-  for(author in authors) {
+  for(let author in authors) {
     if(authors[max] < authors[author]) {
       max = author;
     }
   }
 
   return blogs.length === 0 ? {} : { author: max, likes: authors[max] };
-}
+};
 
 module.exports = {
   dummy,
