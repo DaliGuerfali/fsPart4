@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 const supertest = require('supertest');
 const app = require('../app');
-const Blog = require('../models/blog');
 const User = require('../models/user');
 const helper = require('./testHelper');
+const jwt = require('jsonwebtoken');
 
 
 const api = supertest(app);
@@ -120,25 +120,56 @@ describe('when creating blog posts', () => {
 });
 
 describe('when deleting blog posts', () => {
-  test('verify that a blog is deleted', async () => {
-    const id = '5a422bc61b54a676234d17fc';
+  test('verify that a blog is deleted when authenticated', async () => {
+    const id = '5a422a851b54a676234d17f7';
     await api
       .delete(`/api/blogs/${id}`)
+      .set('authorization', `Bearer ${helper.testToken}`)
       .expect(204);
 
-    const blogsInDb = await Blog.find({});
+    const blogsInDb = (await api.get('/api/blogs')).body;
     expect(blogsInDb).toHaveLength(helper.blogs.length - 1);
     expect(blogsInDb.map(blog => blog.id)).not.toContain(id);
-  });
 
-  test('fails with 400 when id is malformatted', async () => {
-    const id = '5a422bc61b54a676234d17fy';
+    const decodedToken = jwt.verify(helper.testToken, process.env.SECRET);
+    const user = await User.findById(decodedToken.id);
+    expect(user.blogs.map(u => u.toJSON())).not.toContain(id);
+  }, 100000);
+
+  test('fails with 400 when id is malformatted or jwt is invalid', async () => {
+    const id1 = '5a422bc61b54a676234d17fy';
+
+    await api
+      .delete(`/api/blogs/${id1}`)
+      .set('authorization', `Bearer ${helper.testToken}`)
+      .expect(400);
+
+      const id2 = '5a422a851b54a676234d17f7';
+
+      await api
+        .delete(`/api/blogs/${id2}`)
+        .set('authorization', `Bearer qsdlkjqsdjkbqdskjqdsf`)
+        .expect(400);
+  }, 100000);
+
+  test('fails with 401 if token is invalid or missing', async () => {
+    const id = '5a422aa71b54a676234d17f8';
+    await api
+      .delete(`/api/blogs/${id}`)
+      .set('authorization', `Bearer ${helper.testToken}`)
+      .expect(401);
+
+    const invalidToken = jwt.sign({username: 'Mike'}, process.env.SECRET);
 
     await api
       .delete(`/api/blogs/${id}`)
-      .expect(400);
-  });
-
+      .set('authorization', `Bearer ${invalidToken}`)
+      .expect(401);
+    
+    const blogsInDb = (await api.get('/api/blogs')).body;
+    expect(blogsInDb).toHaveLength(helper.blogs.length);
+    expect(blogsInDb.map(blog => blog.id)).toContain(id);
+  }, 100000);
 });
   
 describe('when updating blog posts', () => {
