@@ -140,8 +140,7 @@ describe('when deleting blog posts', () => {
   });
 
 });
-
-
+  
 describe('when updating blog posts', () => {
   test('verify updating works as intended', async() => {
     const blogToUpdate = helper.blogs[0];
