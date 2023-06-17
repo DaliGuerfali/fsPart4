@@ -57,14 +57,14 @@ describe('when creating blog posts', () => {
 
     expect(responseBlogs).toHaveLength(helper.blogs.length + 1);
     expect(responseBlogs.find(blog => blog.id === response.body.id))
-      .toEqual({ 
-        ...newBlog, 
-        id: body.id, 
-        user: { 
-        id: helper.users[0]._id,
-        username: helper.users[0].username,
-        name: helper.users[0].name, 
-    }});
+      .toEqual({
+        ...newBlog,
+        id: body.id,
+        user: {
+          id: helper.users[0]._id,
+          username: helper.users[0].username,
+          name: helper.users[0].name,
+        } });
     const user = await User.findById(helper.users[0]._id);
     expect(user.blogs.map(u => u.toJSON())).toContain(body.id);
 
@@ -101,20 +101,20 @@ describe('when creating blog posts', () => {
     };
 
     await api
-    .post('/api/blogs')
-    .set('authorization', `Bearer ${helper.testToken}`)
-    .send(titleLessBlog)
-    .expect(400);
+      .post('/api/blogs')
+      .set('authorization', `Bearer ${helper.testToken}`)
+      .send(titleLessBlog)
+      .expect(400);
     await api
-    .post('/api/blogs')
-    .set('authorization', `Bearer ${helper.testToken}`)
-    .send(urlLessBlog)
-    .expect(400);
+      .post('/api/blogs')
+      .set('authorization', `Bearer ${helper.testToken}`)
+      .send(urlLessBlog)
+      .expect(400);
     await api
-    .post('/api/blogs')
-    .set('authorization', `Bearer ${helper.testToken}`)
-    .send(authorBlog)
-    .expect(400);
+      .post('/api/blogs')
+      .set('authorization', `Bearer ${helper.testToken}`)
+      .send(authorBlog)
+      .expect(400);
 
   },100000);
 
@@ -157,12 +157,12 @@ describe('when deleting blog posts', () => {
       .set('authorization', `Bearer ${helper.testToken}`)
       .expect(400);
 
-      const id2 = '5a422a851b54a676234d17f7';
+    const id2 = '5a422a851b54a676234d17f7';
 
-      await api
-        .delete(`/api/blogs/${id2}`)
-        .set('authorization', `Bearer qsdlkjqsdjkbqdskjqdsf`)
-        .expect(400);
+    await api
+      .delete(`/api/blogs/${id2}`)
+      .set('authorization', 'Bearer qsdlkjqsdjkbqdskjqdsf')
+      .expect(400);
   }, 100000);
 
   test('fails with 401 if token is invalid or missing', async () => {
@@ -172,19 +172,19 @@ describe('when deleting blog posts', () => {
       .set('authorization', `Bearer ${helper.testToken}`)
       .expect(401);
 
-    const invalidToken = jwt.sign({username: 'Mike'}, process.env.SECRET);
+    const invalidToken = jwt.sign({ username: 'Mike' }, process.env.SECRET);
 
     await api
       .delete(`/api/blogs/${id}`)
       .set('authorization', `Bearer ${invalidToken}`)
       .expect(401);
-    
+
     const blogsInDb = (await api.get('/api/blogs')).body;
     expect(blogsInDb).toHaveLength(helper.blogs.length);
     expect(blogsInDb.map(blog => blog.id)).toContain(id);
   }, 100000);
 });
-  
+
 describe('when updating blog posts', () => {
   test('verify updating works as intended', async() => {
     const blogToUpdate = helper.blogs[0];

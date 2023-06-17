@@ -29,8 +29,8 @@ describe('when fetching users from database', () => {
       .expect('Content-Type', /application\/json/);
 
     response.body.forEach(user => {
-        expect(user.id).toBeDefined();
-        expect(user.passwordHash).not.toBeDefined();
+      expect(user.id).toBeDefined();
+      expect(user.passwordHash).not.toBeDefined();
     });
 
 
@@ -51,12 +51,12 @@ describe('when creating users', () => {
       .expect(201)
       .expect('Content-Type', /application\/json/);
 
-    expect(response.body).toEqual({ 
-        username: newUser.username,
-        //name: newUser.name,
-        id: response.body.id,
-        blogs: []
-        });
+    expect(response.body).toEqual({
+      username: newUser.username,
+      //name: newUser.name,
+      id: response.body.id,
+      blogs: []
+    });
 
     const responseUsers = (await api.get('/api/users')).body;
 
@@ -92,7 +92,7 @@ describe('when creating users', () => {
       .expect(400);
 
     const responseUsers = await User.find({});
-    expect(responseUsers.map(user => user.username)).not.toContain(newUser1.username); 
+    expect(responseUsers.map(user => user.username)).not.toContain(newUser1.username);
     expect(responseUsers.map(user => user.name)).not.toContain(newUser2.name);
 
   },100000);
@@ -105,8 +105,8 @@ describe('when creating users', () => {
       .post('/api/users')
       .send(newUser1)
       .expect(400);
-    
-      const newUser2 = {
+
+    const newUser2 = {
       name: 'noUsername',
       password: 'qsdfsdfsd'
     };
@@ -116,7 +116,7 @@ describe('when creating users', () => {
       .expect(400);
 
     const responseUsers = await User.find({});
-    expect(responseUsers.map(user => user.username)).not.toContain(newUser1.username); 
+    expect(responseUsers.map(user => user.username)).not.toContain(newUser1.username);
     expect(responseUsers.map(user => user.name)).not.toContain(newUser2.name);
 
   },100000);
@@ -129,24 +129,24 @@ describe('when creating users', () => {
       .post('/api/users')
       .send(newUser1)
       .expect(201);
-    
+
     await api
       .post('/api/users')
       .send(newUser1)
       .expect(400);
-    
+
     await api
       .post('/api/users')
       .send(newUser1)
       .expect(400);
-  
+
     await api
       .post('/api/users')
       .send(newUser1)
       .expect(400);
-    
+
     const responseUsers = await User.find({});
-    expect(responseUsers.filter(user => user.username === newUser1.username)).toHaveLength(1); 
+    expect(responseUsers.filter(user => user.username === newUser1.username)).toHaveLength(1);
   },100000);
 });
 

@@ -11,7 +11,7 @@ blogsRouter.get('/', async (request, response) => {
 blogsRouter.post('/', userExtractor, async (request, response) => {
   const body = request.body;
 
-  const blog = new Blog({...body, user: request.user.id });
+  const blog = new Blog({ ...body, user: request.user.id });
   const result = await blog.save();
   request.user.blogs.push(blog.id);
   await request.user.save();
@@ -20,7 +20,7 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
 
 blogsRouter.delete('/:id', userExtractor, async (request, response) => {
   const blog = await Blog.findById(request.params.id);
-  
+
   if(request.user.id !== blog.user.toString()) {
     return response.status(401).json({ error: 'invalid token' });
   }

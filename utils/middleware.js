@@ -11,7 +11,7 @@ const tokenExtractor = (request, response, next) => {
     request.token = null;
   }
   next();
-}
+};
 
 const userExtractor = async (request, response, next) => {
   if(request.token === null) {
@@ -23,7 +23,7 @@ const userExtractor = async (request, response, next) => {
   }
   request.user = await User.findById(userToken.id);
   next();
-}
+};
 
 
 const requestLogger = (request, response, next) => {
@@ -48,7 +48,7 @@ const errorHandler = (error, request, response, next) => {
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message });
   } else if (error.name ===  'JsonWebTokenError') {
-    return response.status(400).json({ error: error.message })
+    return response.status(400).json({ error: error.message });
   }
 
   next(error);
