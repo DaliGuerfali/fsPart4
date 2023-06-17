@@ -117,6 +117,19 @@ describe('when creating blog posts', () => {
     .expect(400);
 
   },100000);
+
+  test('fails with 401 if token not provided', async () => {
+    const newBlog = {
+      title: 'test',
+      author: 'test',
+      url: 'www.test.com',
+      likes: 4
+    };
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401);
+  },100000);
 });
 
 describe('when deleting blog posts', () => {
@@ -190,6 +203,7 @@ describe('when updating blog posts', () => {
       author: 'updatedAuthor',
       title: 'updatedTitle',
       url: 'updatedUrl',
+      user: helper.blogs[0].user
     });
   });
 
@@ -202,7 +216,7 @@ describe('when updating blog posts', () => {
       .expect(400);
   });
 
-  test('verify updating works as with empty object', async() => {
+  test('verify updating works with empty object', async() => {
     const blogToUpdate = helper.blogs[0];
     const updatedBlog = (await api
       .put(`/api/blogs/${blogToUpdate._id}`)
@@ -214,6 +228,7 @@ describe('when updating blog posts', () => {
       author: blogToUpdate.author,
       title: blogToUpdate.title,
       url: blogToUpdate.url,
+      user: helper.blogs[0].user
     });
   });
 });
